@@ -7,6 +7,7 @@ import { WebrtcProvider } from 'y-webrtc'
 import { yCollab } from 'y-codemirror.next'
 import { StateEffect } from '@codemirror/state'
 import { Awareness } from 'y-protocols/awareness'
+import { createSync } from './sync.js'
 
 // Get room name from URL or generate one
 const getRoomName = () => {
@@ -14,27 +15,20 @@ const getRoomName = () => {
     return params.get('room') || crypto.randomUUID()
 }
 
-// Create Yjs document
-const ydoc = new Y.Doc()
+// Initialize sync
 const roomName = getRoomName()
-
-// Create awareness
-const awareness = new Awareness(ydoc)
-
-// Add error handlers for Yjs
-ydoc.on('error', (error) => {
-    console.error('Yjs document error:', error)
-})
-
-// Create Yjs text type
-const ytext = ydoc.getText('codemirror')
+const { ydoc, awareness, ytext, provider } = createSync(roomName)
 
 // Create undo manager
 const undoManager = new Y.UndoManager(ytext)
 
 // Track document changes
 ytext.observe(event => {
-    console.log('Document changed:', event.changes)
+    console.log('Document changed:', {
+        changes: event.changes,
+        currentContent: ytext.toString(),
+        docLength: ytext.length
+    })
 })
 
 // Create CodeMirror editor with initial state
@@ -55,117 +49,76 @@ const view = new EditorView({
     parent: document.getElementById('pad')
 })
 
-// Setup WebRTC provider with error handling
-let webrtcProvider
-try {
-    webrtcProvider = new WebrtcProvider(roomName, ydoc, {
-        signaling: [
-            import.meta.env.DEV ? 'ws://localhost:8787' : 'wss://lanpad-hosted-signaling.metaory.workers.dev'
-        ],
-        filterBcConns: false,
-        connect: true,
-        awareness,
-        maxConns: 20,
-        resyncInterval: 30000,
-        peerOpts: {
-            config: {
-                iceServers: [
-                    { urls: 'stun:stun.l.google.com:19302' },
-                    { urls: 'stun:stun1.l.google.com:19302' },
-                    { urls: 'stun:stun2.l.google.com:19302' },
-                    { urls: 'stun:stun3.l.google.com:19302' },
-                    { urls: 'stun:stun4.l.google.com:19302' }
-                ],
-                iceCandidatePoolSize: 10,
-                iceTransportPolicy: 'all',
-                bundlePolicy: 'max-bundle',
-                rtcpMuxPolicy: 'require'
-            }
+// Enhanced connection status handling
+provider.on('connection-error', (error) => {
+    console.error('WebRTC connection error:', error)
+    document.getElementById('connection-status').textContent = 'Disconnected'
+    document.getElementById('connection-status').style.color = '#e74c3c'
+})
+
+provider.on('connection-ok', () => {
+    console.log('WebRTC connection established')
+    document.getElementById('connection-status').textContent = 'Connected'
+    document.getElementById('connection-status').style.color = '#2ecc71'
+})
+
+provider.on('peer-joined', (peer) => {
+    console.log('Peer joined:', peer)
+    console.log('Current document state:', {
+        content: ytext.toString(),
+        length: ytext.length
+    })
+})
+
+provider.on('peer-left', (peer) => {
+    console.log('Peer left:', peer)
+})
+
+provider.on('sync', (isSynced) => {
+    console.log('Sync status:', isSynced)
+    if (isSynced) {
+        const content = ytext.toString()
+        console.log('Syncing document:', {
+            content,
+            currentEditorContent: view.state.doc.toString(),
+            docLength: ytext.length
+        })
+        
+        if (content !== view.state.doc.toString()) {
+            view.dispatch({
+                changes: {
+                    from: 0,
+                    to: view.state.doc.length,
+                    insert: content
+                }
+            })
         }
-    })
+    }
+})
 
-    // Track active connections
-    const activeConnections = new Set()
-
-    // Enhanced connection status handling
-    webrtcProvider.on('connection-error', (error) => {
-        console.error('WebRTC connection error:', error)
-        document.getElementById('connection-status').textContent = 'Disconnected'
-        document.getElementById('connection-status').style.color = '#e74c3c'
-    })
-
-    webrtcProvider.on('connection-ok', () => {
-        console.log('WebRTC connection established')
+provider.on('status', (status) => {
+    console.log('WebRTC status:', status)
+    if (status.connected) {
         document.getElementById('connection-status').textContent = 'Connected'
         document.getElementById('connection-status').style.color = '#2ecc71'
-    })
+    } else {
+        document.getElementById('connection-status').textContent = 'Connecting...'
+        document.getElementById('connection-status').style.color = '#f39c12'
+    }
+})
 
-    webrtcProvider.on('peer-joined', (peer) => {
-        console.log('Peer joined:', peer)
-        activeConnections.add(peer)
-        console.log('Active connections:', activeConnections.size)
-    })
+// Add more detailed connection logging
+provider.on('webrtc-connection', (conn) => {
+    console.log('WebRTC connection state:', conn.connectionState)
+    console.log('WebRTC ice connection state:', conn.iceConnectionState)
+    console.log('WebRTC ice gathering state:', conn.iceGatheringState)
+    console.log('WebRTC signaling state:', conn.signalingState)
+})
 
-    webrtcProvider.on('peer-left', (peer) => {
-        console.log('Peer left:', peer)
-        activeConnections.delete(peer)
-        console.log('Active connections:', activeConnections.size)
-    })
-
-    webrtcProvider.on('sync', (isSynced) => {
-        console.log('Sync status:', isSynced)
-        if (isSynced) {
-            // Update editor content when sync is complete
-            const content = ytext.toString()
-            if (content !== view.state.doc.toString()) {
-                view.dispatch({
-                    changes: {
-                        from: 0,
-                        to: view.state.doc.length,
-                        insert: content
-                    }
-                })
-            }
-        }
-    })
-
-    webrtcProvider.on('status', (status) => {
-        console.log('WebRTC status:', status)
-        if (status.connected) {
-            document.getElementById('connection-status').textContent = 'Connected'
-            document.getElementById('connection-status').style.color = '#2ecc71'
-        } else {
-            document.getElementById('connection-status').textContent = 'Connecting...'
-            document.getElementById('connection-status').style.color = '#f39c12'
-        }
-    })
-
-    // Add more detailed connection logging
-    webrtcProvider.on('webrtc-connection', (conn) => {
-        console.log('WebRTC connection state:', conn.connectionState)
-        console.log('WebRTC ice connection state:', conn.iceConnectionState)
-        console.log('WebRTC ice gathering state:', conn.iceGatheringState)
-        console.log('WebRTC signaling state:', conn.signalingState)
-    })
-
-    // Cleanup on page unload
-    window.addEventListener('beforeunload', () => {
-        webrtcProvider.destroy()
-    })
-
-    // Force connection attempt only if not already connected
-    setTimeout(() => {
-        if (!webrtcProvider.connected) {
-            console.log('Forcing connection attempt...')
-            webrtcProvider.connect()
-        }
-    }, 1000)
-
-} catch (error) {
-    console.error('Failed to initialize WebRTC provider:', error)
-    document.getElementById('connection-status').textContent = 'Failed to initialize'
-    document.getElementById('connection-status').style.color = '#e74c3c'
-}
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    provider.destroy()
+})
 
 // Bind CodeMirror to Yjs with error handling
 try {
@@ -175,6 +128,12 @@ try {
 
     view.dispatch({
         effects: StateEffect.reconfigure.of(extensions)
+    })
+
+    // Log initial document state
+    console.log('Initial document state:', {
+        content: ytext.toString(),
+        length: ytext.length
     })
 } catch (error) {
     console.error('Failed to initialize CodeMirror collaboration:', error)
