@@ -6,6 +6,7 @@ import * as Y from 'yjs'
 import { WebrtcProvider } from 'y-webrtc'
 import { yCollab } from 'y-codemirror.next'
 import { StateEffect } from '@codemirror/state'
+import { Awareness } from 'y-protocols/awareness'
 
 // Get room name from URL or generate one
 const getRoomName = () => {
@@ -18,7 +19,7 @@ const ydoc = new Y.Doc()
 const roomName = getRoomName()
 
 // Create awareness
-const awareness = new Y.Awareness(ydoc)
+const awareness = new Awareness(ydoc)
 
 // Add error handlers for Yjs
 ydoc.on('error', (error) => {
