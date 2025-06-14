@@ -17,6 +17,9 @@ const getRoomName = () => {
 const ydoc = new Y.Doc()
 const roomName = getRoomName()
 
+// Create awareness
+const awareness = new Y.Awareness(ydoc)
+
 // Create CodeMirror editor
 const state = EditorState.create({
     doc: '',
@@ -48,10 +51,7 @@ const webrtcProvider = new WebrtcProvider(roomName, ydoc, {
     ],
     filterBcConns: false,
     connect: true,
-    awareness: {
-        clientID: crypto.randomUUID()
-    },
-    // Add public STUN servers
+    awareness,
     config: {
         iceServers: [
             { urls: 'stun:stun.l.google.com:19302' },
@@ -65,7 +65,7 @@ const webrtcProvider = new WebrtcProvider(roomName, ydoc, {
 
 // Bind CodeMirror to Yjs
 const extensions = [
-    yCollab(ytext, webrtcProvider.awareness, { undoManager })
+    yCollab(ytext, awareness, { undoManager })
 ]
 
 view.dispatch({
