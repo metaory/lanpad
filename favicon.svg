@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg 
+  width="32"
+  height="32"
+  viewBox="0 0 32 32"
+  xmlns="http://www.w3.org/2000/svg">
+  <rect 
+    rx="12"
+    width="32"
+    height="32"
+    fill="#220044" />
+  <text 
+    x="56%"
+    y="56%"
+    dominant-baseline="middle"
+    text-anchor="middle"
+    fill="#FFCCDD"
+    stroke="#FFCCDD"
+    stroke-width="1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    letter-spacing="0.1em"
+    font-family="system-ui, -apple-system, sans-serif"
+    font-weight="bold"
+    font-size="18">LP</text>
+</svg>
