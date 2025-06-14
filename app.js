@@ -46,7 +46,21 @@ const webrtcProvider = new WebrtcProvider(roomName, ydoc, {
     signaling: [
         import.meta.env.DEV ? 'ws://localhost:8787' : 'wss://lanpad-hosted-signaling.metaory.workers.dev'
     ],
-    filterBcConns: false
+    filterBcConns: false,
+    connect: true,
+    awareness: {
+        clientID: crypto.randomUUID()
+    },
+    // Add public STUN servers
+    config: {
+        iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' },
+            { urls: 'stun:stun2.l.google.com:19302' },
+            { urls: 'stun:stun3.l.google.com:19302' },
+            { urls: 'stun:stun4.l.google.com:19302' }
+        ]
+    }
 })
 
 // Bind CodeMirror to Yjs
@@ -68,13 +82,26 @@ if (!window.location.search) {
 const statusEl = document.getElementById('status')
 statusEl.innerHTML = `Room: ${roomName} | <span id="connection-status">Connecting...</span>`
 
-// Handle connection status
-webrtcProvider.on('connection-error', () => {
+// Enhanced connection status handling
+webrtcProvider.on('connection-error', (error) => {
+    console.error('WebRTC connection error:', error)
     document.getElementById('connection-status').textContent = 'Disconnected'
     document.getElementById('connection-status').style.color = '#e74c3c'
 })
 
 webrtcProvider.on('connection-ok', () => {
+    console.log('WebRTC connection established')
     document.getElementById('connection-status').textContent = 'Connected'
     document.getElementById('connection-status').style.color = '#2ecc71'
-}) 
+})
+
+webrtcProvider.on('peer-joined', (peer) => {
+    console.log('Peer joined:', peer)
+})
+
+webrtcProvider.on('peer-left', (peer) => {
+    console.log('Peer left:', peer)
+})
+
+// Log initial connection attempt
+console.log('Attempting to connect to room:', roomName) 
