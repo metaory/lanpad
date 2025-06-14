@@ -60,14 +60,21 @@ try {
         filterBcConns: false,
         connect: true,
         awareness,
-        config: {
-            iceServers: [
-                { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' },
-                { urls: 'stun:stun2.l.google.com:19302' },
-                { urls: 'stun:stun3.l.google.com:19302' },
-                { urls: 'stun:stun4.l.google.com:19302' }
-            ]
+        maxConns: 20,
+        peerOpts: {
+            config: {
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:stun1.l.google.com:19302' },
+                    { urls: 'stun:stun2.l.google.com:19302' },
+                    { urls: 'stun:stun3.l.google.com:19302' },
+                    { urls: 'stun:stun4.l.google.com:19302' }
+                ],
+                iceCandidatePoolSize: 10,
+                iceTransportPolicy: 'all',
+                bundlePolicy: 'max-bundle',
+                rtcpMuxPolicy: 'require'
+            }
         }
     })
 
@@ -99,6 +106,20 @@ try {
     webrtcProvider.on('status', (status) => {
         console.log('WebRTC status:', status)
     })
+
+    // Add more detailed connection logging
+    webrtcProvider.on('webrtc-connection', (conn) => {
+        console.log('WebRTC connection state:', conn.connectionState)
+        console.log('WebRTC ice connection state:', conn.iceConnectionState)
+        console.log('WebRTC ice gathering state:', conn.iceGatheringState)
+        console.log('WebRTC signaling state:', conn.signalingState)
+    })
+
+    // Force connection attempt
+    setTimeout(() => {
+        console.log('Forcing connection attempt...')
+        webrtcProvider.connect()
+    }, 1000)
 
 } catch (error) {
     console.error('Failed to initialize WebRTC provider:', error)
