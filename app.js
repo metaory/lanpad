@@ -17,7 +17,7 @@ const getRoomName = () => {
 
 // Initialize sync
 const roomName = getRoomName()
-const { ydoc, awareness, ytext, provider } = createSync(roomName)
+const { ydoc, awareness, ytext, provider, onSync } = createSync(roomName)
 
 // Create undo manager
 const undoManager = new Y.UndoManager(ytext)
@@ -31,9 +31,9 @@ ytext.observe(event => {
     })
 })
 
-// Create CodeMirror editor with initial state
+// Create CodeMirror editor
 const state = EditorState.create({
-    doc: ytext.toString(),
+    doc: '',
     extensions: [
         keymap.of(defaultKeymap),
         javascript(),
@@ -47,6 +47,20 @@ const state = EditorState.create({
 const view = new EditorView({
     state,
     parent: document.getElementById('pad')
+})
+
+// Handle sync events
+onSync((content) => {
+    console.log('Syncing content:', content)
+    if (content !== view.state.doc.toString()) {
+        view.dispatch({
+            changes: {
+                from: 0,
+                to: view.state.doc.length,
+                insert: content
+            }
+        })
+    }
 })
 
 // Enhanced connection status handling
@@ -64,36 +78,10 @@ provider.on('connection-ok', () => {
 
 provider.on('peer-joined', (peer) => {
     console.log('Peer joined:', peer)
-    console.log('Current document state:', {
-        content: ytext.toString(),
-        length: ytext.length
-    })
 })
 
 provider.on('peer-left', (peer) => {
     console.log('Peer left:', peer)
-})
-
-provider.on('sync', (isSynced) => {
-    console.log('Sync status:', isSynced)
-    if (isSynced) {
-        const content = ytext.toString()
-        console.log('Syncing document:', {
-            content,
-            currentEditorContent: view.state.doc.toString(),
-            docLength: ytext.length
-        })
-        
-        if (content !== view.state.doc.toString()) {
-            view.dispatch({
-                changes: {
-                    from: 0,
-                    to: view.state.doc.length,
-                    insert: content
-                }
-            })
-        }
-    }
 })
 
 provider.on('status', (status) => {
@@ -128,12 +116,6 @@ try {
 
     view.dispatch({
         effects: StateEffect.reconfigure.of(extensions)
-    })
-
-    // Log initial document state
-    console.log('Initial document state:', {
-        content: ytext.toString(),
-        length: ytext.length
     })
 } catch (error) {
     console.error('Failed to initialize CodeMirror collaboration:', error)

@@ -3,6 +3,7 @@ import { WebrtcProvider } from 'y-webrtc'
 import { Awareness } from 'y-protocols/awareness'
 
 export function createSync(roomName) {
+    // Create the shared document
     const ydoc = new Y.Doc()
     const awareness = new Awareness(ydoc)
     const ytext = ydoc.getText('codemirror')
@@ -34,10 +35,47 @@ export function createSync(roomName) {
         }
     })
 
+    // Track sync state
+    const syncCallbacks = []
+    let isSynced = false
+
+    // Handle sync events
+    provider.on('sync', (synced) => {
+        isSynced = synced
+        if (synced) {
+            console.log('Document synced:', {
+                content: ytext.toString(),
+                length: ytext.length
+            })
+            // Notify all sync callbacks
+            for (const cb of syncCallbacks) {
+                cb(ytext.toString())
+            }
+        }
+    })
+
+    // Handle document updates
+    ytext.observe(event => {
+        if (isSynced) {
+            console.log('Document updated:', {
+                changes: event.changes,
+                content: ytext.toString(),
+                length: ytext.length
+            })
+        }
+    })
+
     return {
         ydoc,
         awareness,
         ytext,
-        provider
+        provider,
+        isSynced: () => isSynced,
+        onSync: (callback) => {
+            if (isSynced) {
+                callback(ytext.toString())
+            }
+            syncCallbacks.push(callback)
+        }
     }
 } 
