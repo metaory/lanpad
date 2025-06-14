@@ -1,19 +1,21 @@
 {
   "name": "lanpad",
   "version": "0.0.1",
-  "description": "Real-time collaborative editor for local networks",
+  "description": "Simple real-time collaborative text editor",
   "type": "module",
   "scripts": {
-    "dev": "vite & npm run ws",
+    "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "ws": "HOST=0.0.0.0 PORT=8080 y-websocket-server"
+    "deploy:cf": "wrangler deploy",
+    "deploy:gh": "npm run build && touch dist/.nojekyll && gh-pages -d dist",
+    "deploy": "echo 'Please run: npm run deploy:cf && npm run deploy:gh'"
   },
   "keywords": [
     "collaborative",
     "editor",
     "realtime",
-    "websocket"
+    "webrtc"
   ],
   "author": "metaory <metaory@gmail.com>",
   "license": "MIT",
@@ -25,13 +27,12 @@
     "@codemirror/lang-javascript": "^6.2.1",
     "@codemirror/state": "^6.4.0",
     "@codemirror/view": "^6.25.1",
-    "@y/websocket-server": "^0.1.1",
     "y-codemirror.next": "^0.3.5",
-    "y-leveldb": "^0.2.0",
-    "y-websocket": "^3.0.0",
+    "y-webrtc": "^10.2.1",
     "yjs": "^13.6.8"
   },
   "devDependencies": {
+    "gh-pages": "^6.1.1",
     "vite": "^6.0.0"
   }
 }

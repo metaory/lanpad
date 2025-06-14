@@ -1,54 +1,27 @@
-<div align="center">
+# LanPad
 
-  <img src="./favicon.svg" alt="LanPad Logo" width="128" height="128">
-  <h1>LanPad</h1>
-  <h4>Real-time collaborative editor for local networks</h4>
-</div>
-
----
+A simple, real-time collaborative text editor that works right in your browser.
 
 ## Features
-- Real-time text synchronization
-- Minimal and lightweight
-- Simple and clean interface
-- Zero dependencies
-- Modern browser features
+
+- Real-time collaboration
+- No sign-up required
+- Works on any device
+- Dark mode by default
+- Simple room-based sharing
 
 ## Quick Start
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/metaory/lanpad.git
-   cd lanpad
-   ```
+1. Visit [LanPad](https://metaory.github.io/lanpad/)
+2. Create a new room or join an existing one
+3. Share the room URL to collaborate
 
-2. Start the server:
-   ```bash
-   npm start
-   ```
+## Tips
 
-3. Access the editor:
-   ```
-   http://<server-ip>:8080
-   ```
-
-## Network Setup
-
-1. Run the server on a machine in your local network
-2. Access from other devices using the server's IP address
-3. Works with VPN as long as devices are on the same network
-
-## Keyboard Shortcuts
-- `Ctrl + B` - Bold
-- `Ctrl + I` - Italic
-- `Ctrl + U` - Underline
-- `Ctrl + 5` - Strikethrough
-- `Ctrl + Shift + L` - Unordered list
-- `Ctrl + Shift + O` - Ordered list
-- `Ctrl + Shift + H` - Heading
-- `Ctrl + Shift + C` - Code block
-- `Ctrl + Shift + 8` - Quote
-- `Ctrl + Shift + 9` - Horizontal line
+- Use unique room names for private collaboration
+- Room names are case-sensitive
+- Changes sync automatically
+- Works best on modern browsers
 
 ## Development
 
@@ -58,14 +31,54 @@ npm install
 
 # Start development server
 npm run dev
-
-# Build for production
-npm run build
 ```
+
+## Deployment
+
+The project has two parts that need to be deployed:
+
+1. **Frontend (GitHub Pages)**
+   - Automatically deployed via GitHub Actions
+   - No additional setup needed
+
+2. **Signaling Server (Cloudflare Workers)**
+   - Requires Cloudflare account and Wrangler CLI
+   - Setup steps:
+     ```bash
+     # Install Wrangler
+     npm install -g wrangler
+
+     # Login to Cloudflare
+     wrangler login
+
+     # Deploy signaling server
+     npm run deploy:cf
+     ```
 
 ## License
 
-[MIT](LICENSE)
+MIT
+
+## Use Cases
+
+- 📝 Collaborative note-taking
+- 👥 Team meetings and discussions
+- 🎓 Group study sessions
+- 💡 Brainstorming sessions
+- 📋 Shared task lists
+- 📚 Code reviews
+- ✍️ Collaborative writing
+
+## Limitations
+
+- No file upload/download
+- No data persistence
+- Anyone with the room name can join
+- May not work in all network conditions
+
+## Contributing
+
+Feel free to open issues or submit pull requests.
 
 
 

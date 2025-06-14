@@ -1,0 +1,11 @@
+name = "lanpad-hosted-signaling"
+main = "signaling.js"
+compatibility_date = "2024-03-20"
+
+account_id = "f859b4f042b0b1cf0a65ad292e4c0e73"
+
+[triggers]
+crons = []
+
+[env.production]
+workers_dev = true

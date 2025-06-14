@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LanPad - Editor</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <base href="/lanpad/">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #1e1e1e;
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        #pad {
+            flex: 1;
+            width: 100%;
+            height: calc(100vh - 40px);
+            overflow: hidden;
+        }
+        .status {
+            padding: 10px 20px;
+            background: #252526;
+            font-size: 14px;
+            color: #666;
+        }
+        .cm-editor {
+            height: 100%;
+        }
+        .cm-scroller {
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="pad"></div>
+    <div class="status" id="status">Connecting...</div>
+    <script type="module" src="/app.js"></script>
+</body>
+</html> 
