@@ -61,6 +61,7 @@ try {
         connect: true,
         awareness,
         maxConns: 20,
+        resyncInterval: 30000, // Resync every 30 seconds instead of default
         peerOpts: {
             config: {
                 iceServers: [
@@ -78,6 +79,9 @@ try {
         }
     })
 
+    // Track active connections
+    const activeConnections = new Set()
+
     // Enhanced connection status handling
     webrtcProvider.on('connection-error', (error) => {
         console.error('WebRTC connection error:', error)
@@ -93,10 +97,14 @@ try {
 
     webrtcProvider.on('peer-joined', (peer) => {
         console.log('Peer joined:', peer)
+        activeConnections.add(peer)
+        console.log('Active connections:', activeConnections.size)
     })
 
     webrtcProvider.on('peer-left', (peer) => {
         console.log('Peer left:', peer)
+        activeConnections.delete(peer)
+        console.log('Active connections:', activeConnections.size)
     })
 
     webrtcProvider.on('sync', (isSynced) => {
@@ -105,6 +113,13 @@ try {
 
     webrtcProvider.on('status', (status) => {
         console.log('WebRTC status:', status)
+        if (status.connected) {
+            document.getElementById('connection-status').textContent = 'Connected'
+            document.getElementById('connection-status').style.color = '#2ecc71'
+        } else {
+            document.getElementById('connection-status').textContent = 'Connecting...'
+            document.getElementById('connection-status').style.color = '#f39c12'
+        }
     })
 
     // Add more detailed connection logging
@@ -115,10 +130,17 @@ try {
         console.log('WebRTC signaling state:', conn.signalingState)
     })
 
-    // Force connection attempt
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+        webrtcProvider.destroy()
+    })
+
+    // Force connection attempt only if not already connected
     setTimeout(() => {
-        console.log('Forcing connection attempt...')
-        webrtcProvider.connect()
+        if (!webrtcProvider.connected) {
+            console.log('Forcing connection attempt...')
+            webrtcProvider.connect()
+        }
     }, 1000)
 
 } catch (error) {
@@ -146,9 +168,9 @@ if (!window.location.search) {
     window.history.replaceState({}, '', newUrl)
 }
 
-// Add room info to status
+// Add room info to status with initial connecting state
 const statusEl = document.getElementById('status')
-statusEl.innerHTML = `Room: ${roomName} | <span id="connection-status">Connecting...</span>`
+statusEl.innerHTML = `Room: ${roomName} | <span id="connection-status" style="color: #f39c12;">Connecting...</span>`
 
 // Log initial connection attempt
 console.log('Attempting to connect to room:', roomName) 
