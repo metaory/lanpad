@@ -44,8 +44,7 @@ const undoManager = new Y.UndoManager(ytext)
 // Setup WebRTC provider
 const webrtcProvider = new WebrtcProvider(roomName, ydoc, {
     signaling: [
-        'ws://localhost:8787',  // Local development
-        'wss://lanpad-hosted-signaling.metaory.workers.dev'  // Production
+        import.meta.env.DEV ? 'ws://localhost:8787' : 'wss://lanpad-hosted-signaling.metaory.workers.dev'
     ],
     filterBcConns: false
 })
