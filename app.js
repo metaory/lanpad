@@ -26,9 +26,20 @@ ydoc.on('error', (error) => {
     console.error('Yjs document error:', error)
 })
 
-// Create CodeMirror editor
+// Create Yjs text type
+const ytext = ydoc.getText('codemirror')
+
+// Create undo manager
+const undoManager = new Y.UndoManager(ytext)
+
+// Track document changes
+ytext.observe(event => {
+    console.log('Document changed:', event.changes)
+})
+
+// Create CodeMirror editor with initial state
 const state = EditorState.create({
-    doc: '',
+    doc: ytext.toString(),
     extensions: [
         keymap.of(defaultKeymap),
         javascript(),
@@ -44,12 +55,6 @@ const view = new EditorView({
     parent: document.getElementById('pad')
 })
 
-// Create Yjs text type
-const ytext = ydoc.getText('codemirror')
-
-// Create undo manager
-const undoManager = new Y.UndoManager(ytext)
-
 // Setup WebRTC provider with error handling
 let webrtcProvider
 try {
@@ -61,7 +66,7 @@ try {
         connect: true,
         awareness,
         maxConns: 20,
-        resyncInterval: 30000, // Resync every 30 seconds instead of default
+        resyncInterval: 30000,
         peerOpts: {
             config: {
                 iceServers: [
@@ -109,6 +114,19 @@ try {
 
     webrtcProvider.on('sync', (isSynced) => {
         console.log('Sync status:', isSynced)
+        if (isSynced) {
+            // Update editor content when sync is complete
+            const content = ytext.toString()
+            if (content !== view.state.doc.toString()) {
+                view.dispatch({
+                    changes: {
+                        from: 0,
+                        to: view.state.doc.length,
+                        insert: content
+                    }
+                })
+            }
+        }
     })
 
     webrtcProvider.on('status', (status) => {
