@@ -4,7 +4,7 @@
   "description": "Simple real-time collaborative text editor",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "node server.js & vite",
     "build": "vite build",
     "preview": "vite preview",
     "deploy:cf": "wrangler deploy",
@@ -30,7 +30,8 @@
     "y-codemirror.next": "^0.3.5",
     "y-protocols": "^1.0.6",
     "y-webrtc": "^10.2.1",
-    "yjs": "^13.6.8"
+    "yjs": "^13.6.8",
+    "ws": "^8.16.0"
   },
   "devDependencies": {
     "gh-pages": "^6.1.1",

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LanPad - Real-time collaborative editor</title>
+    <title>LanPad - Editor</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <base href="/lanpad/">
     <style>
@@ -16,88 +16,29 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
         }
-        .container {
-            text-align: center;
-            padding: 2rem;
-            background: #252526;
-            border-radius: 12px;
-            max-width: 400px;
-            width: 90%;
-        }
-        h1 {
-            margin: 0 0 1rem;
-            font-size: 2rem;
-        }
-        .disclaimer {
-            font-size: 0.8rem;
-            color: #666;
-            margin: 1rem 0;
-            line-height: 1.4;
-        }
-        .room-input {
-            display: flex;
-            gap: 0.5rem;
-            margin: 1rem 0;
-        }
-        input {
-            flex: 1;
+        #status {
             padding: 0.5rem;
-            border: none;
-            border-radius: 6px;
-            background: #333;
-            color: #fff;
-            font-size: 1rem;
+            background: #252526;
+            border-bottom: 1px solid #333;
+            font-size: 0.9rem;
+            text-align: center;
         }
-        button {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 6px;
-            background: #0066cc;
-            color: #fff;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.2s;
+        #pad {
+            flex: 1;
+            overflow: hidden;
         }
-        button:hover {
-            background: #0052a3;
+        .cm-editor {
+            height: 100%;
         }
-        .or {
-            margin: 1rem 0;
-            color: #666;
+        .cm-scroller {
+            overflow: auto;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>LanPad</h1>
-        <div class="room-input">
-            <input type="text" id="roomName" placeholder="Enter room name (optional)">
-            <button onclick="joinRoom()">Join Room</button>
-        </div>
-        <div class="or">or</div>
-        <button onclick="createRoom()">Create New Room</button>
-        <div class="disclaimer">
-            Note: Anyone with the room name can join and edit. No authentication required.
-            For sensitive content, use a unique, hard-to-guess room name.
-        </div>
-    </div>
-    <script>
-        function joinRoom() {
-            const room = document.getElementById('roomName').value.trim()
-            window.location.href = `pad.html${room ? `?room=${room}` : ''}`
-        }
-
-        function createRoom() {
-            window.location.href = 'pad.html'
-        }
-
-        // Allow Enter key to submit
-        document.getElementById('roomName').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') joinRoom()
-        })
-    </script>
+    <div id="status">Searching for peers on LAN...</div>
+    <div id="pad"></div>
+    <script type="module" src="app.js"></script>
 </body>
 </html> 

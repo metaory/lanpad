@@ -2,17 +2,18 @@ import * as Y from 'yjs'
 import { WebrtcProvider } from 'y-webrtc'
 import { Awareness } from 'y-protocols/awareness'
 
-export function createSync(roomName) {
-    // Create the shared document
+export function createSync() {
     const ydoc = new Y.Doc()
     const awareness = new Awareness(ydoc)
     const ytext = ydoc.getText('codemirror')
+    const roomName = 'lanpad'
+    const wsUrl = `ws://${window.location.hostname}:4444`
+    const syncCallbacks = []
+    let isSynced = false
 
     // Create WebRTC provider
     const provider = new WebrtcProvider(roomName, ydoc, {
-        signaling: [
-            import.meta.env.DEV ? 'ws://localhost:8787' : 'wss://lanpad-hosted-signaling.metaory.workers.dev'
-        ],
+        signaling: [wsUrl],
         filterBcConns: false,
         connect: true,
         awareness,
@@ -20,13 +21,7 @@ export function createSync(roomName) {
         resyncInterval: 30000,
         peerOpts: {
             config: {
-                iceServers: [
-                    { urls: 'stun:stun.l.google.com:19302' },
-                    { urls: 'stun:stun1.l.google.com:19302' },
-                    { urls: 'stun:stun2.l.google.com:19302' },
-                    { urls: 'stun:stun3.l.google.com:19302' },
-                    { urls: 'stun:stun4.l.google.com:19302' }
-                ],
+                iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
                 iceCandidatePoolSize: 10,
                 iceTransportPolicy: 'all',
                 bundlePolicy: 'max-bundle',
@@ -35,33 +30,56 @@ export function createSync(roomName) {
         }
     })
 
-    // Track sync state
-    const syncCallbacks = []
-    let isSynced = false
+    // Update UI with peer count
+    function updatePeerCount(count) {
+        const statusEl = document.getElementById('status')
+        if (statusEl) {
+            const baseText = statusEl.textContent.split(' - ')[0]
+            statusEl.textContent = `${baseText} - ${count} peer${count !== 1 ? 's' : ''} connected`
+        }
+    }
+
+    // Track awareness changes
+    awareness.on('change', (changes) => {
+        const states = Array.from(awareness.getStates().entries())
+        updatePeerCount(states.length)
+    })
 
     // Handle sync events
     provider.on('sync', (synced) => {
         isSynced = synced
         if (synced) {
-            console.log('Document synced:', {
-                content: ytext.toString(),
-                length: ytext.length
-            })
-            // Notify all sync callbacks
+            const content = ytext.toString()
             for (const cb of syncCallbacks) {
-                cb(ytext.toString())
+                cb(content)
             }
         }
     })
 
-    // Handle document updates
-    ytext.observe(event => {
-        if (isSynced) {
-            console.log('Document updated:', {
-                changes: event.changes,
-                content: ytext.toString(),
-                length: ytext.length
-            })
+    // Handle peer events
+    provider.on('peer-joined', () => {
+        const states = Array.from(awareness.getStates().entries())
+        updatePeerCount(states.length)
+        isSynced = true
+        const content = ytext.toString()
+        for (const cb of syncCallbacks) {
+            cb(content)
+        }
+    })
+
+    provider.on('peer-left', () => {
+        const states = Array.from(awareness.getStates().entries())
+        updatePeerCount(states.length)
+    })
+
+    // Handle status changes
+    provider.on('status', (status) => {
+        if (status.connected) {
+            isSynced = true
+            const content = ytext.toString()
+            for (const cb of syncCallbacks) {
+                cb(content)
+            }
         }
     })
 
@@ -72,10 +90,8 @@ export function createSync(roomName) {
         provider,
         isSynced: () => isSynced,
         onSync: (callback) => {
-            if (isSynced) {
-                callback(ytext.toString())
-            }
+            if (isSynced) callback(ytext.toString())
             syncCallbacks.push(callback)
         }
     }
-} 
+}

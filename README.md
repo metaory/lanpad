@@ -1,68 +1,47 @@
 # LanPad
 
-A simple, real-time collaborative text editor that works right in your browser.
+A simple, real-time collaborative text editor that works over your local network.
 
 ## Features
 
-- Real-time collaboration
-- No sign-up required
+- Real-time collaboration over LAN
+- No internet required
+- No sign-up needed
 - Works on any device
-- Dark mode by default
 - Simple room-based sharing
 
 ## Quick Start
 
-1. Visit [LanPad](https://metaory.github.io/lanpad/)
-2. Create a new room or join an existing one
-3. Share the room URL to collaborate
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/metaory/lanpad.git
+   cd lanpad
+   ```
 
-## Tips
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-- Use unique room names for private collaboration
-- Room names are case-sensitive
-- Changes sync automatically
-- Works best on modern browsers
+3. Start the server:
+   ```bash
+   npm run dev
+   ```
 
-## Development
+4. Open your browser and visit:
+   ```
+   http://localhost:4444
+   ```
 
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-```
-
-## Deployment
-
-The project has two parts that need to be deployed:
-
-1. **Frontend (GitHub Pages)**
-   - Automatically deployed via GitHub Actions
-   - No additional setup needed
-
-2. **Signaling Server (Cloudflare Workers)**
-   - Requires Cloudflare account and Wrangler CLI
-   - Setup steps:
-     ```bash
-     # Install Wrangler
-     npm install -g wrangler
-
-     # Login to Cloudflare
-     wrangler login
-
-     # Deploy signaling server
-     npm run deploy:cf
-     ```
-
-## License
-
-MIT
+5. Share your local IP address with others on the same network:
+   ```
+   http://YOUR_LOCAL_IP:4444
+   ```
 
 ## Use Cases
 
-- 📝 Collaborative note-taking
-- 👥 Team meetings and discussions
+- 📝 Collaborative note-taking in meetings
+- 👥 Team discussions in the office
 - 🎓 Group study sessions
 - 💡 Brainstorming sessions
 - 📋 Shared task lists
@@ -71,15 +50,11 @@ MIT
 
 ## Limitations
 
+- Requires all users to be on the same local network
 - No file upload/download
 - No data persistence
 - Anyone with the room name can join
-- May not work in all network conditions
+- May not work across different network segments 
 
-## Contributing
-
-Feel free to open issues or submit pull requests.
-
-
-
-
+## License
+[MIT](LICENSE)
