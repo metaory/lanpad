@@ -1,15 +1,12 @@
 {
   "name": "lanpad",
-  "version": "0.0.1",
-  "description": "Simple real-time collaborative text editor",
+  "version": "0.0.2",
+  "description": "Simple real-time collaborative text editor over local network",
   "type": "module",
   "scripts": {
     "dev": "node server.js & vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "deploy:cf": "wrangler deploy",
-    "deploy:gh": "npm run build && touch dist/.nojekyll && gh-pages -d dist",
-    "deploy": "echo 'Please run: npm run deploy:cf && npm run deploy:gh'"
+    "preview": "vite preview"
   },
   "keywords": [
     "collaborative",
@@ -23,18 +20,17 @@
   "homepage": "https://metaory.github.io/lanpad/",
   "repository": "git+https://github.com/metaory/lanpad.git",
   "dependencies": {
+    "ws": "^8.16.0",
+    "yjs": "^13.6.8",
+    "y-webrtc": "^10.2.1",
+    "y-protocols": "^1.0.6",
+    "y-codemirror.next": "^0.3.5",
     "@codemirror/commands": "^6.3.3",
     "@codemirror/lang-javascript": "^6.2.1",
     "@codemirror/state": "^6.4.0",
-    "@codemirror/view": "^6.25.1",
-    "y-codemirror.next": "^0.3.5",
-    "y-protocols": "^1.0.6",
-    "y-webrtc": "^10.2.1",
-    "yjs": "^13.6.8",
-    "ws": "^8.16.0"
+    "@codemirror/view": "^6.25.1"
   },
   "devDependencies": {
-    "gh-pages": "^6.1.1",
     "vite": "^6.0.0"
   }
 }

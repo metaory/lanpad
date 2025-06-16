@@ -1,6 +1,6 @@
 # LanPad
 
-A simple, real-time collaborative text editor that works over your local network.
+Simple real-time collaborative text editor over local network
 
 ## Features
 
