@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,34 +12,117 @@
             margin: 0;
             padding: 0;
             font-family: system-ui, -apple-system, sans-serif;
-            background: #1e1e1e;
-            color: #fff;
+            background: #220033;
+            color: #EEAAFF;
             height: 100vh;
             display: flex;
             flex-direction: column;
         }
+
         #status {
-            padding: 0.5rem;
-            background: #252526;
-            border-bottom: 1px solid #333;
+            font-family: "Bungee";
+            padding: 0.6rem;
             font-size: 0.9rem;
             text-align: center;
+            position: absolute;
+            right: 4px;
+            z-index: 1;
+            height: max-content;
+            width: max-content;
+            color: #ff3399;
+            border-bottom-left-radius: 16px;
+            backdrop-filter: blur(2px);
+            text-shadow: 0 0 8px currentColor;
+            cursor: pointer;
         }
+
+        #status::before {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: -2px;
+            width: 92%;
+            height: 4px;
+            opacity: 0.7;
+            border-radius: 4px;
+            background: currentColor;
+            transform: scaleX(0.8);
+            transform-origin: right;
+            transition: transform 0.2s;
+            box-shadow: 0 0 8px currentColor;
+        }
+        #status:hover::before {
+            transform: scaleX(1);
+            opacity: 1;
+        }
+
+        #github {
+            position: fixed;
+            right: 4px;
+            bottom: 4px;
+            opacity: 0.6;
+            color: #4411FF;
+            transition: all 0.2s;
+        }
+
+        #github:hover {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
         #pad {
             flex: 1;
             overflow: hidden;
         }
+
         .cm-editor {
             height: 100%;
         }
-        .cm-scroller {
-            overflow: auto;
+
+        .ͼo {
+            background-color: #220033;
+        }
+
+        .ͼo .cm-gutters {
+            font-family: "Nabla";
+            font-size: 12px;
+            text-shadow: 0 0 8px currentColor;
+            color: #EEAAFF;
+            background-color: #280038;
+            box-shadow: 0 0 30px #110022;
         }
     </style>
 </head>
+
 <body>
-    <div id="status">Searching for peers on LAN...</div>
+    <div id="status" title="connected peers" tool>
+        <span>0</span>
+    </div>
     <div id="pad"></div>
+    <a id="github" href="https://github.com/metaory/lanpad">
+        <svg viewBox="0 0 24 24" width="32" height="32">
+            <defs>
+                <filter id="glow" x="-50%" y="-50%" width="200%" height="200%" filterUnits="userSpaceOnUse">
+                    <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                    <feMerge>
+                        <feMergeNode in="coloredBlur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+            </defs>
+            <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" filter="url(#glow)">
+                <path stroke-dasharray="32" stroke-dashoffset="32"
+                    d="M12 4c1.67 0 2.61 0.4 3 0.5c0.53 -0.43 1.94 -1.5 3.5 -1.5c0.34 1 0.29 2.22 0 3c0.75 1 1 2 1 3.5c0 2.19 -0.48 3.58 -1.5 4.5c-1.02 0.92 -2.11 1.37 -3.5 1.5c0.65 0.54 0.5 1.87 0.5 2.5c0 0.73 0 3 0 3M12 4c-1.67 0 -2.61 0.4 -3 0.5c-0.53 -0.43 -1.94 -1.5 -3.5 -1.5c-0.34 1 -0.29 2.22 0 3c-0.75 1 -1 2 -1 3.5c0 2.19 0.48 3.58 1.5 4.5c1.02 0.92 2.11 1.37 3.5 1.5c-0.65 0.54 -0.5 1.87 -0.5 2.5c0 0.73 0 3 0 3">
+                    <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.7s" values="32;0" />
+                </path>
+                <path stroke-dasharray="10" stroke-dashoffset="10"
+                    d="M9 19c-1.41 0 -2.84 -0.56 -3.69 -1.19c-0.84 -0.63 -1.09 -1.66 -2.31 -2.31">
+                    <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.8s" dur="0.2s" values="10;0" />
+                </path>
+            </g>
+        </svg>
+    </a>
     <script type="module" src="app.js"></script>
 </body>
-</html> 
+
+</html>

@@ -8,15 +8,15 @@
     rx="12"
     width="32"
     height="32"
-    fill="#220044" />
+    fill="#ff0077" />
   <text 
-    x="56%"
-    y="56%"
+    x="55%"
+    y="55%"
     dominant-baseline="middle"
     text-anchor="middle"
-    fill="#FFCCDD"
-    stroke="#FFCCDD"
-    stroke-width="1"
+    fill="#220044"
+    stroke="#220044"
+    stroke-width="2.5"
     stroke-linecap="round"
     stroke-linejoin="round"
     letter-spacing="0.1em"
